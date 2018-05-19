@@ -120,5 +120,14 @@ namespace HammingCode.Services
                 return false;
             else return IsPowerOf2(target / 2);
         }
+
+        public void CalculateBitSizes(ref int byteSize, ref int totalBits, ref int numberOfParityBits, int numberOfDataBits)
+        {
+            numberOfParityBits = (int)Math.Floor(Math.Log(numberOfDataBits, 2)) + 2;     //Plus two for Master Parity Bit and Parity Bit 1.
+            totalBits = numberOfDataBits + numberOfParityBits;
+            byteSize = totalBits % 8 == 0 ? totalBits / 8 : (totalBits / 8) + 1;
+        }
+
+        
     }
 }

@@ -23,7 +23,7 @@ namespace HammingCode.HammingTypes
         #endregion
 
         #region Interface Methods
-        public void ConvertByteArrayToHammingCode(byte[] targetValue)
+        public virtual void ConvertByteArrayToHammingCode(byte[] targetValue)
         {
             //Input errors
             if (targetValue == null)
@@ -36,35 +36,56 @@ namespace HammingCode.HammingTypes
             }
 
             //size calculations
-            int numberOfDataBits = targetValue.Length * 8;
-            int numberOfParityBits = (int) Math.Floor(Math.Log(numberOfDataBits, 2)) + 2;     //Plus two for Master Parity Bit and Parity Bit 1.
-            int totalBits = numberOfDataBits + numberOfParityBits;
-            int byteSize = totalBits % 8 == 0 ? totalBits / 8 : (totalBits / 8) + 1;
+            int numberOfDataBits = targetValue.Length * 8, numberOfParityBits = 0, totalBits = 0, byteSize = 0;
+            services.CalculateBitSizes(ref byteSize, ref totalBits, ref numberOfParityBits, numberOfDataBits);
 
             //update properties
             DataBitsSize = numberOfDataBits;
             HammingBytes = services.BuildHamming(targetValue, byteSize, numberOfParityBits);
         }
 
-        public Object RetrieveValue()
+        public virtual Object RetrieveValue()
         {
             return services.HammingCodeToDataBytesArray(DataBitsSize, HammingBytes);
         }
 
-        public HammingReport BuildReport()
+        public virtual HammingReport BuildReport()
         {
             throw new NotImplementedException();
         }
 
-        public void SimulateRandomError()
+        public virtual void SimulateRandomError()
         {
-            throw new NotImplementedException();
+            Random random = new Random();
+            int numberOfErrors = random.Next(3);        //1 or 2 errors
+
+            int byteSize = 0, totalBits = 0, numberOfParityBits = 0;
+            services.CalculateBitSizes(ref byteSize, ref totalBits, ref numberOfParityBits, DataBitsSize);
+
+            int flipBitAt = random.Next(totalBits);     //first error
+            FlipBitAt(flipBitAt);            
+
+            if (numberOfErrors > 1)                     //one-third chance of second error. (And yes, there's a chance that it corrects the first flipped bit)
+            {
+                flipBitAt = random.Next(totalBits);
+                FlipBitAt(flipBitAt);
+            }
         }
 
         #endregion
 
         #region Private Methods
-        
+        private void FlipBitAt(int index)
+        {
+            if (services.GetBit(HammingBytes[index / 8], index % 8))    //Bit is 1.
+            {
+                HammingBytes[index / 8] = services.SetBit(HammingBytes[index / 8], index % 8, 0); //Set to 0.
+            }
+            else                                                        //Bit is 0.
+            {
+                HammingBytes[index /8] = services.SetBit(HammingBytes[index / 8], index % 8, 1); //Set to 1.
+            }
+        }
 
         #endregion
     }

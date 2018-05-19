@@ -12,11 +12,12 @@ namespace HammingCode
             byte[] bytesArray = { 0x90, 0x01, 0x0a, 0x20 };
             code.ConvertByteArrayToHammingCode(bytesArray);
 
-            byte[] data = code.RetrieveValue() as byte[];
             
-            //code.SimulateRandomError();
+            code.SimulateRandomError();
 
             //code.BuildReport();
+
+            byte[] data = code.RetrieveValue() as byte[];
             Console.WriteLine("Success!");
             
         }
