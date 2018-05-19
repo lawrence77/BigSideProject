@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using HammingCode.HammingTypes;
 using HammingCode.Services;
 using HammingCode.HammingExceptions;
 

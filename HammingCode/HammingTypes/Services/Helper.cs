@@ -66,7 +66,20 @@ namespace HammingCode.Services
 
         public byte[] HammingCodeToDataBytesArray(int dataBitSize, byte[] hammingBytes)
         {
-            throw new NotImplementedException();
+            byte[] data = new byte[dataBitSize / 8];
+
+            int dataIndex = 0;
+            for (int index = 0; index < hammingBytes.Length*8 && dataIndex < dataBitSize; index++)
+            {
+                if (!IsPowerOf2(index))
+                {
+                    if (GetBit(hammingBytes[index / 8], index % 8))
+                        data[dataIndex / 8] = SetBit(data[dataIndex / 8], dataIndex % 8, 1);
+                    dataIndex++;
+                }
+            }
+
+            return data;
         }
 
         public bool GetBit(byte target, int offset)
