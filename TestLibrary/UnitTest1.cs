@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using HammingCode.HammingTypes;
 
 namespace TestLibrary
 {
@@ -8,7 +9,7 @@ namespace TestLibrary
         [TestMethod]
         public void TestMethod1()
         {
-            
+                        
         }
     }
 }

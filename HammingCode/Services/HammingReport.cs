@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace HammingCode.Components
+namespace HammingCode.Services
 {
-    public class HammingReport
+    public struct HammingReport
     {
         
     }
