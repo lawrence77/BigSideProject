@@ -7,19 +7,15 @@ namespace HammingCode
     {
         static void Main(string[] args)
         {
-            BaseHammingObject code = new BaseHammingObject();
-
             byte[] bytesArray = { 0x90, 0x01, 0x0a, 0x20 };
-            code.ConvertByteArrayToHammingCode(bytesArray);
+            BaseHammingObject code = new BaseHammingObject(bytesArray);
 
-            
             code.SimulateRandomError();
 
-            //code.BuildReport();
+            code.BuildReport();
 
             byte[] data = code.RetrieveValue() as byte[];
             Console.WriteLine("Success!");
-            
         }
     }
 }

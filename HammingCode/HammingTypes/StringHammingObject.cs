@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using HammingCode.HammingTypes;
-using HammingCode.Services;
-using HammingCode.HammingExceptions;
+using HammingCode.HammingTypes.Services;
+using HammingCode.HammingTypes.Exceptions;
 
 namespace HammingCode.Components
 {

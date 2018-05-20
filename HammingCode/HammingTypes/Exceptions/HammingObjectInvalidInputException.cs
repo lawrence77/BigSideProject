@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace HammingCode.HammingExceptions
+namespace HammingCode.HammingTypes.Exceptions
 {
     public class HammingObjectInvalidInputException : Exception
     {

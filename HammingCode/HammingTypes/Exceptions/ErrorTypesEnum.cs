@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace HammingCode.Services
+namespace HammingCode.HammingTypes.Exceptions
 {
-    enum ErrorTypesEnum
+    public enum ErrorTypesEnum
     {
         NoError,
         MasterParityBitError,

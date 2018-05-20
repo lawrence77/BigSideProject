@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using HammingCode.Services;
+using HammingCode.HammingTypes.Services;
 
 namespace HammingCode.HammingTypes
 {
     /// <summary>
     /// Hamming-Code object that will be able to encode the byte(s) and provide Single-Bit Correct and Double-bit detection errors.
-    /// <code>BuildReport</code> is able to check the bits.
-    
     /// </summary>
     public interface IHammingObject
     {
