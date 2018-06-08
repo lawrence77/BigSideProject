@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using HammingCode.HammingTypes.Services;
 using HammingCode.HammingTypes.Exceptions;
 
 namespace HammingCode.HammingTypes
 {
-    public class BaseHammingObject : IHammingObject
+    public class HammingObject : IHammingObject
     {
         #region Properties
         public bool IsErroneous { get; set; }
@@ -16,22 +15,45 @@ namespace HammingCode.HammingTypes
         #endregion
 
         #region Constructors
-        public BaseHammingObject()
+        /// <summary>
+        /// Base Constructor for the HammingObject. 
+        /// </summary>
+        public HammingObject()
         {
             IsErroneous = false;
             HammingBytes = null;
             DataBitsSize = 0;
         }
 
-        public BaseHammingObject(byte[] targetValues) : this()
+        /// <summary>
+        /// Constructs a HammingObject with a byte array converted to a hamming sequence.
+        /// </summary>
+        /// <param name="targetValues">Byte array that will be converted to Hamming Code</param>
+        public HammingObject(byte[] targetValues) : this()
         {
-            ConvertByteArrayToHammingCode(targetValues);
+            EncodeToHammingCode(targetValues);
         }
-
+        
+        /// <summary>
+        /// Returns a deep copy of this HammingObject.
+        /// </summary>
+        /// <returns>Returns a new object with the same Data value and encoding as this Hamming Object. </returns>
+        public HammingObject Clone()
+        {
+            HammingObject clone = new HammingObject(this.RetrieveValue() as byte[]);
+            if (this.IsErroneous)
+                clone.IsErroneous = true;
+            return clone;
+        }
+        
         #endregion
 
         #region Interface Methods
-        public virtual void ConvertByteArrayToHammingCode(byte[] targetValue)
+        /// <summary>
+        /// Given an array of bytes, creates a Hamming-Sequence of bits that protect the data.
+        /// </summary>
+        /// <param name="targetValue">Bytes representing a type of data.</param>
+        public virtual void EncodeToHammingCode(byte[] targetValue)
         {
             //Input errors
             if (targetValue == null)
@@ -42,8 +64,13 @@ namespace HammingCode.HammingTypes
             //update properties
             DataBitsSize = targetValue.Length * 8;
             HammingBytes = BuildHamming(targetValue, DataBitsSize + GetParityBitsSize());
+            IsErroneous = false;
         }
 
+        /// <summary>
+        /// Retrieves the data given to the HammingObject. 
+        /// </summary>
+        /// <returns>Returns the same Object type given to the HammingCode</returns>
         public virtual Object RetrieveValue()
         {
             if (HammingBytes == null)   //error checking
@@ -51,6 +78,11 @@ namespace HammingCode.HammingTypes
             return HammingCodeToDataBytesArray();
         }
 
+        /// <summary>
+        /// Examines the current HammingObject and builds a report based on its bits. 
+        /// The method will also auto-correct Single-Bit errors.
+        /// </summary>
+        /// <returns> Gives a HammingReport object back to the caller. </returns>
         public virtual HammingReport BuildReport()
         {
             int syndrome = GetSyndrome();
@@ -72,6 +104,9 @@ namespace HammingCode.HammingTypes
             return report;
         }
 
+        /// <summary>
+        /// <code>SimualteError</code> is a method for incorrectly flipping a bit.
+        /// </summary>     
         public virtual void SimulateRandomError()
         {
             if (HammingBytes == null)   //error checking
@@ -94,6 +129,10 @@ namespace HammingCode.HammingTypes
         #endregion
 
         #region Override Methods
+        /// <summary>
+        /// Converts this object to its visual representation.
+        /// </summary>
+        /// <returns>Returns a string. </returns>
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder(BitConverter.ToString(HammingBytes));
@@ -102,26 +141,47 @@ namespace HammingCode.HammingTypes
             return sb.ToString().ToLower();
         }
 
+        /// <summary>
+        /// Checks if another object is equivalent to this HammingObject.
+        /// </summary>
+        /// <param name="obj">Another object.</param>
+        /// <returns>Returns true if the other is equivalent based on type and properties. </returns>
         public override bool Equals(object obj)
         {
             if (obj == null)
                 return false;
 
-            BaseHammingObject other = obj as BaseHammingObject;
+            HammingObject other = obj as HammingObject;
             if (other == null)
                 return false;
-            if (IsErroneous == other.IsErroneous && other.RetrieveValue().Equals(RetrieveValue()))
+            if (IsErroneous == other.IsErroneous)
+            {
+                byte[] thisArray = this.RetrieveValue() as byte[];
+                byte[] otherArray = other.RetrieveValue() as byte[];
+                if (thisArray.Length != otherArray.Length)
+                {
+                    return false;
+                }
+                for (int i = 0; i < thisArray.Length; i++)
+                {
+                    if (thisArray[i] != otherArray[i]) return false;
+                }
+
                 return true;
+            }
             return false;
         }
 
+        /// <summary>
+        /// Gets the hash code of this HammingObject.
+        /// </summary>
+        /// <returns> Returns the hash code for this object. </returns>
         public override int GetHashCode() 
         {
             return base.GetHashCode();
         }
 
         #endregion
-
 
         #region Protected Methods
         /// <summary>

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using HammingCode.HammingTypes.Services;
 
 namespace HammingCode.HammingTypes
 {
@@ -14,7 +13,7 @@ namespace HammingCode.HammingTypes
         /// Given an array of bytes, creates a Hamming-Sequence of bits that protect the data.
         /// </summary>
         /// <param name="targetValue">Bytes representing a type of data.</param>
-        void ConvertByteArrayToHammingCode(byte[] targetValue);
+        void EncodeToHammingCode(byte[] targetValue);
 
         /// <summary>
         /// Retrieves the data given to the HammingObject. 

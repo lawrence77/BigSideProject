@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using HammingCode.HammingTypes.Exceptions;
 
-namespace HammingCode.HammingTypes.Services
+namespace HammingCode.HammingTypes
 {
     public struct HammingReport
     {

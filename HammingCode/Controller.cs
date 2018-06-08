@@ -8,7 +8,7 @@ namespace HammingCode
         static void Main(string[] args)
         {
             byte[] bytesArray = { 0x90, 0x01, 0x0a, 0x20 };
-            BaseHammingObject code = new BaseHammingObject(bytesArray);
+            HammingObject code = new HammingObject(bytesArray);
 
             code.SimulateRandomError();
 

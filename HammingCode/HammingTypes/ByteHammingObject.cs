@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using HammingCode.HammingTypes;
-using HammingCode.HammingTypes.Services;
 using HammingCode.HammingTypes.Exceptions;
 
 namespace HammingCode
@@ -19,7 +18,7 @@ namespace HammingCode
             throw new NotImplementedException();
         }
 
-        public void ConvertByteArrayToHammingCode(byte[] targetValue)
+        public void EncodeToHammingCode(byte[] targetValue)
         {
             throw new NotImplementedException();
         }
