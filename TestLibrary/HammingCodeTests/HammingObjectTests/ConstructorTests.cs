@@ -4,6 +4,9 @@ using HammingCode.HammingTypes.Exceptions;
 
 namespace TestLibrary
 {
+    /// <summary>
+    /// Tests the Constructors and Clone method for the HammingObject.
+    /// </summary>
     [TestClass]
     public class ConstructorTests
     {
@@ -39,8 +42,6 @@ namespace TestLibrary
 
             Assert.AreEqual(hc.IsErroneous, hammingClone.IsErroneous);
             Assert.AreEqual(hc, hammingClone);
-        }
-
-        
+        }        
     }
 }
