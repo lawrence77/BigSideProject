@@ -154,22 +154,19 @@ namespace HammingCode.HammingTypes
             HammingObject other = obj as HammingObject;
             if (other == null)
                 return false;
-            if (IsErroneous == other.IsErroneous)
-            {
-                byte[] thisArray = this.RetrieveValue() as byte[];
-                byte[] otherArray = other.RetrieveValue() as byte[];
-                if (thisArray.Length != otherArray.Length)
-                {
-                    return false;
-                }
-                for (int i = 0; i < thisArray.Length; i++)
-                {
-                    if (thisArray[i] != otherArray[i]) return false;
-                }
 
-                return true;
+            byte[] thisArray = this.RetrieveValue() as byte[];
+            byte[] otherArray = other.RetrieveValue() as byte[];
+            if (thisArray.Length != otherArray.Length)
+            {
+                return false;
             }
-            return false;
+            for (int i = 0; i < thisArray.Length; i++)
+            {
+                if (thisArray[i] != otherArray[i]) return false;
+            }
+
+            return true;
         }
 
         /// <summary>
