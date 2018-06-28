@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using HammingCode.HammingTypes;
 using HammingCode.HammingTypes.Exceptions;
+using System;
 
 namespace TestLibrary
 {
@@ -10,19 +11,21 @@ namespace TestLibrary
     [TestClass]
     public class HammingObjectTests
     {
+        private const int MAX_BYTE_VALUE = 256;
         private byte[] test;
+        private Random rand;
 
         [TestInitialize]
         public void InitTests()
         {
             test = new byte[4] { 0x90, 0x01, 0x0a, 0x20 };
+            rand = new Random();
         }
 
         [TestMethod]
         public void SimpleConstructorTest()
         {
             HammingObject hc = new HammingObject();
-            Assert.IsFalse(hc.IsErroneous);
             Assert.ThrowsException<EmptyHammingObjectException>(hc.RetrieveValue); 
         }
 
@@ -30,7 +33,6 @@ namespace TestLibrary
         public void ByteConstructorTest()
         {
             HammingObject hc = new HammingObject(test);
-            Assert.IsFalse(hc.IsErroneous);
             Assert.IsNotNull(hc.RetrieveValue());
         }
 
@@ -62,51 +64,185 @@ namespace TestLibrary
             HammingObject hc = new HammingObject(test);
             HammingObject hammingClone = hc.Clone();
 
-            Assert.AreEqual(hc.IsErroneous, hammingClone.IsErroneous);
             Assert.AreEqual(hc, hammingClone);
         }
 
         [TestMethod]
-        public void EncodingToHammingTest()
-        {
-            throw new System.NotImplementedException();
-        }
-
-
-        [TestMethod]
         public void SimulateNoErrorTest()
         {
-            throw new System.NotImplementedException();
+            for (int byteSize = 1; byteSize < 16; byteSize++)
+            {
+                byte[] byteArray = createByteArray(byteSize);
+
+                HammingObject hc = HammingObject.ParseByteArray(byteArray); // encodes byte array
+
+                // Simulate no error by doing nothing
+
+                // builds and checks report
+                HammingReport hr = hc.BuildReport(); 
+                Assert.IsTrue(hr.Status == ErrorTypesEnum.NoError); 
+                Assert.IsTrue(hr.Syndrome == 0);
+
+                // checks return value
+                byte[] retrievedValue = hc.RetrieveValue() as byte[];
+                Assert.IsNotNull(retrievedValue);
+                Assert.IsTrue(retrievedValue.Length == byteArray.Length);
+                for (int i = 0; i < byteArray.Length; i++)
+                {
+                    Assert.IsTrue(byteArray[i] == retrievedValue[i]);
+                }
+            }
         }
 
         [TestMethod]
         public void SimulateMasterBitErrorTest()
         {
-            throw new System.NotImplementedException();
+            for (int byteSize = 1; byteSize < 16; byteSize++)
+            {
+                byte[] byteArray = createByteArray(byteSize);
+
+                HammingObject hc = HammingObject.ParseByteArray(byteArray); // encodes byte array
+
+                // Simulate Master Bit Error
+                hc.SimulateMasterParityBitError();
+
+                // builds and checks report
+                HammingReport hr = hc.BuildReport(); 
+                Assert.IsTrue(hr.Status == ErrorTypesEnum.MasterParityBitError); 
+                Assert.IsTrue(hr.Syndrome == 0);
+                Assert.IsTrue(hr.Corrected); // Ensures HammingObject is corrected
+
+                // checks return value
+                byte[] retrievedValue = hc.RetrieveValue() as byte[];
+                Assert.IsNotNull(retrievedValue);
+                Assert.IsTrue(retrievedValue.Length == byteArray.Length);
+                for (int i = 0; i < byteArray.Length; i++)
+                {
+                    Assert.IsTrue(byteArray[i] == retrievedValue[i]);
+                }
+            }
         }
 
         [TestMethod]
         public void SimulateSingleParityBitErrorTest()
         {
-            throw new System.NotImplementedException();
+            for (int byteSize = 1; byteSize < 16; byteSize++)
+            {
+                byte[] byteArray = createByteArray(byteSize);
+
+                HammingObject hc = HammingObject.ParseByteArray(byteArray); // encodes byte array
+
+                // Simulate Master Bit Error
+                hc.SimulateSingleParityBitError();
+
+                // builds and checks report
+                HammingReport hr = hc.BuildReport();
+                Assert.IsTrue(hr.Status == ErrorTypesEnum.ParityBitError);
+                Assert.IsTrue(hr.Syndrome > 0);
+                Assert.IsTrue(hr.Corrected); // Ensures HammingObject is corrected
+
+                // checks return value
+                byte[] retrievedValue = hc.RetrieveValue() as byte[];
+                Assert.IsNotNull(retrievedValue);
+                Assert.IsTrue(retrievedValue.Length == byteArray.Length);
+                for (int i = 0; i < byteArray.Length; i++)
+                {
+                    Assert.IsTrue(byteArray[i] == retrievedValue[i]);
+                }
+            }
         }
 
         [TestMethod]
         public void SimulateSingleDataBitErrorTest()
         {
-            throw new System.NotImplementedException();
+            for (int byteSize = 1; byteSize < 16; byteSize++)
+            {
+                byte[] byteArray = createByteArray(byteSize);
+
+                HammingObject hc = HammingObject.ParseByteArray(byteArray); // encodes byte array
+
+                // Simulate Master Bit Error
+                hc.SimulateSingleDataBitError();
+
+                // builds and checks report
+                HammingReport hr = hc.BuildReport();
+                Assert.IsTrue(hr.Status == ErrorTypesEnum.DataBitError);
+                Assert.IsTrue(hr.Syndrome > 0);
+                Assert.IsTrue(hr.Corrected); // Ensures HammingObject is corrected
+
+                // checks return value
+                byte[] retrievedValue = hc.RetrieveValue() as byte[];
+                Assert.IsNotNull(retrievedValue);
+                Assert.IsTrue(retrievedValue.Length == byteArray.Length);
+                for (int i = 0; i < byteArray.Length; i++)
+                {
+                    Assert.IsTrue(byteArray[i] == retrievedValue[i]);
+                }
+            }
         }
 
         [TestMethod]
         public void SimulateDoubleBitErrorTest()
         {
-            throw new System.NotImplementedException();
+            for (int byteSize = 1; byteSize < 16; byteSize++)
+            {
+                byte[] byteArray = createByteArray(byteSize);
+
+                HammingObject hc = HammingObject.ParseByteArray(byteArray); // encodes byte array
+
+                // Simulate Master Bit Error
+                hc.SimulateDoubleBitError();
+
+                // builds and checks report
+                HammingReport hr = hc.BuildReport();
+                Assert.IsTrue(hr.Status == ErrorTypesEnum.MultiBitError);
+                Assert.IsTrue(hr.Syndrome > 0);
+                Assert.IsFalse(hr.Corrected); // Ensures HammingObject could not be corrected
+
+                // checks return value
+                byte[] retrievedValue = hc.RetrieveValue() as byte[];
+                Assert.IsNotNull(retrievedValue);
+                Assert.IsTrue(retrievedValue.Length == byteArray.Length); 
+            }
         }
 
         [TestMethod]
         public void SimlulateRandomErrorTest()
         {
-            throw new System.NotImplementedException();
+            for (int i = 0; i < 10000; i++)
+            {
+                int selector = rand.Next(5);
+                switch (selector)
+                {
+                    case 0:
+                        SimulateNoErrorTest();
+                        break;
+                    case 1:
+                        SimulateMasterBitErrorTest();
+                        break;
+                    case 2:
+                        SimulateSingleDataBitErrorTest();
+                        break;
+                    case 3:
+                        SimulateSingleParityBitErrorTest();
+                        break;
+                    case 4:
+                        SimulateDoubleBitErrorTest();
+                        break;
+                }
+
+            }
+        }
+
+        private byte[] createByteArray(int numberOfBytes)
+        {          
+            //create new byte array with random values
+            byte[] byteArray = new byte[numberOfBytes];
+            for (int i = 0; i < byteArray.Length; i++)
+            {
+                byteArray[i] = (byte)rand.Next(MAX_BYTE_VALUE);
+            }
+            return byteArray;
         }
     }
 }

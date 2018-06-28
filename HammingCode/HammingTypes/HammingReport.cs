@@ -9,11 +9,13 @@ namespace HammingCode.HammingTypes
     {
         public ErrorTypesEnum Status;
         public int Syndrome;
+        public bool Corrected;
 
-        public HammingReport(ErrorTypesEnum typeOfError, int errorLocation)
+        public HammingReport(int errorLocation, ErrorTypesEnum typeOfError, bool errorFixed)
         {
             Status = typeOfError;
             Syndrome = errorLocation;
+            Corrected = errorFixed;
         }
     }
 }

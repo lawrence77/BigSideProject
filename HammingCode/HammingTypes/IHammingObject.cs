@@ -28,9 +28,5 @@ namespace HammingCode.HammingTypes
         /// <returns> Gives a HammingReport object back to the caller. </returns>
         HammingReport BuildReport();
 
-        /// <summary>
-        /// <code>SimualteError</code> is a method for incorrectly flipping a bit.
-        /// </summary>        
-        void SimulateRandomError();
     }
 }

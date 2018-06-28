@@ -8,7 +8,6 @@ namespace HammingCode.HammingTypes
     public class HammingObject : IHammingObject
     {
         #region Properties
-        public bool IsErroneous { get; set; }
         protected byte[] HammingBytes { get; set; }
         private int DataBitsSize { get; set; }
         
@@ -20,7 +19,6 @@ namespace HammingCode.HammingTypes
         /// </summary>
         public HammingObject()
         {
-            IsErroneous = false;
             HammingBytes = null;
             DataBitsSize = 0;
         }
@@ -40,10 +38,7 @@ namespace HammingCode.HammingTypes
         /// <returns>Returns a new object with the same Data value and encoding as this Hamming Object. </returns>
         public HammingObject Clone()
         {
-            HammingObject clone = new HammingObject(this.RetrieveValue() as byte[]);
-            if (this.IsErroneous)
-                clone.IsErroneous = true;
-            return clone;
+            return new HammingObject(this.RetrieveValue() as byte[]);
         }
         
         #endregion
@@ -64,7 +59,6 @@ namespace HammingCode.HammingTypes
             //update properties
             DataBitsSize = targetValue.Length * 8;
             HammingBytes = BuildHamming(targetValue, DataBitsSize + GetParityBitsSize());
-            IsErroneous = false;
         }
 
         /// <summary>
@@ -99,34 +93,95 @@ namespace HammingCode.HammingTypes
                 errorType = ErrorTypesEnum.ParityBitError;
             else errorType = ErrorTypesEnum.DataBitError;
 
-            HammingReport report = new HammingReport(errorType, syndrome);
-            IsErroneous = !CorrectError(report);
+            bool errorFixed = CorrectError(syndrome, errorType);
+            HammingReport report = new HammingReport(syndrome, errorType, errorFixed);
             return report;
+        }
+         
+        #endregion
+
+        #region Static Methods
+        public static HammingObject ParseByteArray(byte[] byteArray)
+        {
+            return new HammingObject(byteArray);
+        }
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Flips the first bit to simulate a Master Parity Bit Error. 
+        /// </summary>
+        public virtual void SimulateMasterParityBitError()
+        {
+            if (HammingBytes == null)
+                throw new EmptyHammingObjectException("Hamming Object is empty");
+
+            FlipBitAt(0);            
         }
 
         /// <summary>
-        /// <code>SimualteError</code> is a method for incorrectly flipping a bit.
-        /// </summary>     
-        public virtual void SimulateRandomError()
+        /// Flips a bit at any power of two index, except index zero, to simulate a Single Parity Bit Error.
+        /// </summary>
+        public virtual void SimulateSingleParityBitError()
         {
-            if (HammingBytes == null)   //error checking
-                throw new EmptyHammingObjectException("Hamming Object is empty.");
+            if (HammingBytes == null)
+                throw new EmptyHammingObjectException("Hamming Object is empty");
 
-            Random random = new Random();
-            int numberOfErrors = random.Next(3);        //0, 1, or 2 errors
+            //takes the ceiling of the log of the number of bytes to determine the number of the parity bits needed
+            int numberOfParityBits = (int) Math.Ceiling(Math.Log(HammingBytes.Length, 2));       
 
-            int totalBits = DataBitsSize + GetParityBitsSize();
-            if (numberOfErrors > 0)
-            {
-                FlipBitAt(random.Next(totalBits));  //first error
-            }
-            if (numberOfErrors > 1)                 
-            {
-                FlipBitAt(random.Next(totalBits));  //second error (And yes, there's a chance that it corrects the first flipped bit)
-            }            
+            Random rand = new Random();
+            int randNum = rand.Next(numberOfParityBits) + 1;  // excludes the master bit and includes the last parity bit
+
+            FlipBitAt(1 << randNum); // take 2^randNum for the correct parity index to flip
         }
 
-        #endregion
+        /// <summary>
+        /// Flips a bit at any index that isn't a power of two to simulate a Single Data Bit Error.
+        /// </summary>
+        public virtual void SimulateSingleDataBitError()
+        {
+            if (HammingBytes == null)
+                throw new EmptyHammingObjectException("Hamming Object is empty");
+
+            Random rand = new Random();
+            int randNum;
+
+            // repeats until a power of two is not choosen
+            do
+            {
+                randNum = rand.Next(HammingBytes.Length * 8);
+            } while (IsPowerOf2(randNum)); 
+
+            FlipBitAt(randNum);
+        }
+
+        /// <summary>
+        /// Flips two distinct bit indices to simulate a Double Bit Error.
+        /// </summary>
+        public virtual void SimulateDoubleBitError()
+        {
+            if (HammingBytes == null)
+                throw new EmptyHammingObjectException("Hamming Object is empty");
+
+            Random rand = new Random();
+            int randNum1;
+            int randNum2;
+
+            // repeats until two distinct numbers are choosen
+            do
+            {
+                randNum1 = rand.Next(HammingBytes.Length * 8);
+                randNum2 = rand.Next(HammingBytes.Length * 8);
+            } while (randNum1 == randNum2);
+
+            // evaluation for specific data and parity bit indices are not necessary for this type of error
+            FlipBitAt(randNum1);
+            FlipBitAt(randNum2);
+        }
+
+        #endregion 
 
         #region Override Methods
         /// <summary>
@@ -256,6 +311,8 @@ namespace HammingCode.HammingTypes
         {
             if (HammingBytes == null)                                   //error checking
                 return;
+            if (index < 0 || index > HammingBytes.Length * 8)
+                throw new IndexOutOfRangeException("Index out of Hamming Code Bounds");
 
             if (GetBit(HammingBytes[index / 8], index % 8))             //Bit is 1.
             {
@@ -425,13 +482,13 @@ namespace HammingCode.HammingTypes
         /// <param name="report">Report will indicate the status and syndrome of this HammingObject</param>
         /// <returns>Returns true if the HammingObject has no errors and that is successfully corrected any errors. Returns false
         /// if errors were detected, but unable to fix. </returns>
-        protected virtual bool CorrectError(HammingReport report)
+        protected virtual bool CorrectError(int syndrome, ErrorTypesEnum status)
         {
             if (HammingBytes == null)
                 throw new EmptyHammingObjectException("Hamming Object is empty");
 
             bool success = false;
-            switch (report.Status)
+            switch (status)
             {
                 case ErrorTypesEnum.NoError:
                     success = true;
@@ -439,7 +496,7 @@ namespace HammingCode.HammingTypes
                 case ErrorTypesEnum.MasterParityBitError:
                 case ErrorTypesEnum.ParityBitError:
                 case ErrorTypesEnum.DataBitError:
-                    FlipBitAt(report.Syndrome);
+                    FlipBitAt(syndrome);
                     success = true;
                     break;
                 case ErrorTypesEnum.MultiBitError:
