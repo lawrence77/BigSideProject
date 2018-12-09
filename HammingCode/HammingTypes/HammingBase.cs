@@ -221,6 +221,12 @@ namespace HammingCode.HammingTypes
             if (other == null)
                 return false;
 
+            if (this.HammingBytes == null && other.HammingBytes == null) // both are empty
+                return true;
+            if (this.HammingBytes == null || other.HammingBytes == null) // only one is empty
+                return false;
+
+            // Neither are empty
             byte[] thisArray = this.RetrieveValue() as byte[];
             byte[] otherArray = other.RetrieveValue() as byte[];
 
