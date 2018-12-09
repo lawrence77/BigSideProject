@@ -1,5 +1,5 @@
 # SideProjects
----
+
 ## Goal
 Create classes, algorithms, and mini-projects to practice and learn. 
 
