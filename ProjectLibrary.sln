@@ -3,11 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonalWebApp", "PersonalWebApp\PersonalWebApp.csproj", "{FC7E01B7-CEB1-47A0-A0E7-DFE3A7C19A20}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HammingCode", "HammingCode\HammingCode.csproj", "{257991FE-53EC-4FF3-B735-F4FA45419667}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HammingCode", "HammingCode\HammingCode.csproj", "{257991FE-53EC-4FF3-B735-F4FA45419667}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestLibrary", "TestLibrary\TestLibrary.csproj", "{4AACF319-5305-45B1-9424-C41C7135353D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestLibrary", "TestLibrary\TestLibrary.csproj", "{4AACF319-5305-45B1-9424-C41C7135353D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FC7E01B7-CEB1-47A0-A0E7-DFE3A7C19A20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FC7E01B7-CEB1-47A0-A0E7-DFE3A7C19A20}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FC7E01B7-CEB1-47A0-A0E7-DFE3A7C19A20}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FC7E01B7-CEB1-47A0-A0E7-DFE3A7C19A20}.Release|Any CPU.Build.0 = Release|Any CPU
 		{257991FE-53EC-4FF3-B735-F4FA45419667}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{257991FE-53EC-4FF3-B735-F4FA45419667}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{257991FE-53EC-4FF3-B735-F4FA45419667}.Release|Any CPU.ActiveCfg = Release|Any CPU

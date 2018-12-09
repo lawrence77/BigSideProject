@@ -5,10 +5,10 @@ using HammingCode.HammingTypes.Exceptions;
 
 namespace HammingCode.HammingTypes
 {
-    public class HammingObject : IHammingObject
+    public class HammingBase : IHammingObject
     {
         #region Properties
-        protected byte[] HammingBytes { get; set; }
+        private byte[] HammingBytes { get; set; }
         private int DataBitsSize { get; set; }
         
         #endregion
@@ -17,7 +17,7 @@ namespace HammingCode.HammingTypes
         /// <summary>
         /// Base Constructor for the HammingObject. 
         /// </summary>
-        public HammingObject()
+        public HammingBase()
         {
             HammingBytes = null;
             DataBitsSize = 0;
@@ -27,7 +27,7 @@ namespace HammingCode.HammingTypes
         /// Constructs a HammingObject with a byte array converted to a hamming sequence.
         /// </summary>
         /// <param name="targetValues">Byte array that will be converted to Hamming Code</param>
-        public HammingObject(byte[] targetValues) : this()
+        public HammingBase(byte[] targetValues) : this()
         {
             EncodeToHammingCode(targetValues);
         }
@@ -36,9 +36,9 @@ namespace HammingCode.HammingTypes
         /// Returns a deep copy of this HammingObject.
         /// </summary>
         /// <returns>Returns a new object with the same Data value and encoding as this Hamming Object. </returns>
-        public HammingObject Clone()
+        public HammingBase Clone()
         {
-            return new HammingObject(this.RetrieveValue() as byte[]);
+            return new HammingBase(this.RetrieveValue() as byte[]);
         }
         
         #endregion
@@ -97,14 +97,16 @@ namespace HammingCode.HammingTypes
             HammingReport report = new HammingReport(syndrome, errorType, errorFixed);
             return report;
         }
-         
+
         #endregion
 
         #region Static Methods
-        public static HammingObject ParseByteArray(byte[] byteArray)
-        {
-            return new HammingObject(byteArray);
-        }
+        /// <summary>
+        /// Encodes a byte array into a hamming sequence.
+        /// </summary>
+        /// <param name="byteArray"></param>
+        /// <returns></returns>
+        public static HammingBase EncodeByteArray(byte[] byteArray) => new HammingBase(byteArray);
         #endregion
 
         #region Public Methods
@@ -181,6 +183,15 @@ namespace HammingCode.HammingTypes
             FlipBitAt(randNum2);
         }
 
+        /// <summary>
+        /// Returns a copy of the underlying bytes that encode the data
+        /// </summary>
+        /// <returns></returns>
+        public virtual byte[] GetHammingBytes()
+        {            
+            return HammingBytes;
+        }
+
         #endregion 
 
         #region Override Methods
@@ -206,22 +217,26 @@ namespace HammingCode.HammingTypes
             if (obj == null)
                 return false;
 
-            HammingObject other = obj as HammingObject;
+            HammingBase other = obj as HammingBase;
             if (other == null)
                 return false;
 
             byte[] thisArray = this.RetrieveValue() as byte[];
             byte[] otherArray = other.RetrieveValue() as byte[];
-            if (thisArray.Length != otherArray.Length)
-            {
-                return false;
-            }
-            for (int i = 0; i < thisArray.Length; i++)
-            {
-                if (thisArray[i] != otherArray[i]) return false;
-            }
 
-            return true;
+            if (thisArray != null && otherArray != null)
+            {
+                if (thisArray.Length != otherArray.Length)
+                    return false;
+                for (int i = 0; i < thisArray.Length; i++)
+                    if (thisArray[i] != otherArray[i])
+                        return false;
+
+                return true;
+            }
+            if (thisArray == null && otherArray == null)
+                return true;
+            return false;
         }
 
         /// <summary>

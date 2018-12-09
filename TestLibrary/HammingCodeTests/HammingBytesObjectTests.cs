@@ -3,13 +3,13 @@ using HammingCode.HammingTypes;
 using HammingCode.HammingTypes.Exceptions;
 using System;
 
-namespace TestLibrary
+namespace TestLibrary.HammingCodeTests
 {
     /// <summary>
     /// Tests the Constructors and Clone method for the HammingObject.
     /// </summary>
     [TestClass]
-    public class HammingObjectTests
+    public class HammingBytesObjectTests
     {
         private const int MAX_BYTE_VALUE = 256;
         private byte[] test;
@@ -25,21 +25,21 @@ namespace TestLibrary
         [TestMethod]
         public void SimpleConstructorTest()
         {
-            HammingObject hc = new HammingObject();
+            HammingBase hc = new HammingBase();
             Assert.ThrowsException<EmptyHammingObjectException>(hc.RetrieveValue); 
         }
 
         [TestMethod]
         public void ByteConstructorTest()
         {
-            HammingObject hc = new HammingObject(test);
+            HammingBase hc = new HammingBase(test);
             Assert.IsNotNull(hc.RetrieveValue());
         }
 
         [TestMethod]
         public void EqualsTest()
         {
-            HammingObject hc1 = new HammingObject(test);
+            HammingBase hc1 = new HammingBase(test);
             
             Assert.IsFalse(hc1.Equals(null)); 
 
@@ -47,24 +47,69 @@ namespace TestLibrary
             Assert.IsFalse(hc1.Equals(testString));
 
             byte[] anotherByteArray = { 0x00, 0x01, 0x02 }; //differing byte array lengths
-            HammingObject hc2 = new HammingObject(anotherByteArray);
+            HammingBase hc2 = new HammingBase(anotherByteArray);
             Assert.IsFalse(hc1.Equals(hc2));
 
             byte[] secondByteArray = { 0x00, 0x01, 0x02, 0x03 }; //same byte array lengths
-            HammingObject hc3 = new HammingObject(secondByteArray);
+            HammingBase hc3 = new HammingBase(secondByteArray);
             Assert.IsFalse(hc1.Equals(hc3));
 
-            HammingObject hc4 = new HammingObject(test);
+            HammingBase hc4 = new HammingBase(test);
             Assert.IsTrue(hc1.Equals(hc4));
+
+            HammingInteger hcInt32 = new HammingInteger(537526672);
+            Assert.IsFalse(hc1.Equals(hcInt32));
         }
 
         [TestMethod]
         public void CloneTest()
         {
-            HammingObject hc = new HammingObject(test);
-            HammingObject hammingClone = hc.Clone();
+            HammingBase hc = new HammingBase(test);
+            HammingBase hammingClone = hc.Clone();
 
             Assert.AreEqual(hc, hammingClone);
+        }
+
+        [TestMethod]
+        public void TestGetHammingBytes()
+        {
+            HammingBase hc = HammingBase.EncodeByteArray(test);
+
+            byte[] testArray = hc.GetHammingBytes();
+            Assert.IsNotNull(testArray);
+
+            byte[] cloneArray = new byte[testArray.Length];
+            for (int i = 0; i < testArray.Length; i++)
+            {
+                cloneArray[i] = testArray[i];
+            }
+
+            hc = HammingBase.EncodeByteArray(new byte[2]{ 0x1, 0x0});
+            byte[] testArray2 = hc.GetHammingBytes();
+
+            // Ensures that the testArray is just a copy of the Hamming Bytes. Not a reference
+            Assert.IsTrue(cloneArray.Length == testArray.Length);
+            for (int i = 0; i < cloneArray.Length; i++)
+            {
+                Assert.IsTrue(cloneArray[i] == testArray[i]);
+            }
+
+            Assert.IsFalse(testArray.Length == testArray2.Length);
+        }
+
+        [TestMethod]
+        public void TestBytesArrayEncoding()
+        {
+            HammingBase hc = HammingBase.EncodeByteArray(test);
+
+            byte[] testArray = hc.RetrieveValue() as byte[];
+
+            Assert.IsNotNull(testArray);
+            Assert.AreEqual(testArray.Length, test.Length);
+            for (int i = 0; i < testArray.Length; i++)
+            {
+                Assert.IsTrue(test[i] == testArray[i]);
+            }
         }
 
         [TestMethod]
@@ -74,7 +119,7 @@ namespace TestLibrary
             {
                 byte[] byteArray = createByteArray(byteSize);
 
-                HammingObject hc = HammingObject.ParseByteArray(byteArray); // encodes byte array
+                HammingBase hc = HammingBase.EncodeByteArray(byteArray); // encodes byte array
 
                 // Simulate no error by doing nothing
 
@@ -101,7 +146,7 @@ namespace TestLibrary
             {
                 byte[] byteArray = createByteArray(byteSize);
 
-                HammingObject hc = HammingObject.ParseByteArray(byteArray); // encodes byte array
+                HammingBase hc = HammingBase.EncodeByteArray(byteArray); // encodes byte array
 
                 // Simulate Master Bit Error
                 hc.SimulateMasterParityBitError();
@@ -130,7 +175,7 @@ namespace TestLibrary
             {
                 byte[] byteArray = createByteArray(byteSize);
 
-                HammingObject hc = HammingObject.ParseByteArray(byteArray); // encodes byte array
+                HammingBase hc = HammingBase.EncodeByteArray(byteArray); // encodes byte array
 
                 // Simulate Master Bit Error
                 hc.SimulateSingleParityBitError();
@@ -159,7 +204,7 @@ namespace TestLibrary
             {
                 byte[] byteArray = createByteArray(byteSize);
 
-                HammingObject hc = HammingObject.ParseByteArray(byteArray); // encodes byte array
+                HammingBase hc = HammingBase.EncodeByteArray (byteArray); // encodes byte array
 
                 // Simulate Master Bit Error
                 hc.SimulateSingleDataBitError();
@@ -188,7 +233,7 @@ namespace TestLibrary
             {
                 byte[] byteArray = createByteArray(byteSize);
 
-                HammingObject hc = HammingObject.ParseByteArray(byteArray); // encodes byte array
+                HammingBase hc = HammingBase.EncodeByteArray(byteArray); // encodes byte array
 
                 // Simulate Master Bit Error
                 hc.SimulateDoubleBitError();
