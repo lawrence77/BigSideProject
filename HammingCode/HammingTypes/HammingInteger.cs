@@ -236,8 +236,9 @@ namespace HammingCode.HammingTypes
 
                 case TypeOfInteger.Int16:
                     Int16 shortNum = data[1]; // high byte
+                    Int16 temp = data[0];
                     shortNum <<= 8;
-                    shortNum |= data[0]; // low byte
+                    shortNum |= temp; // low byte
                     return shortNum;
 
                 case TypeOfInteger.Int32:
