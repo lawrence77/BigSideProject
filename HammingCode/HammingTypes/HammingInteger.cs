@@ -166,6 +166,9 @@ namespace HammingCode.HammingTypes
             {
                 switch(this.status)
                 {
+                    case TypeOfInteger.None:
+                        return true;
+
                     case TypeOfInteger.ArrayOfBytes:
                         byte[] arrayData = this.RetrieveValue() as byte[];
                         byte[] otherArrayData = other.RetrieveValue() as byte[];
@@ -179,6 +182,7 @@ namespace HammingCode.HammingTypes
                             return true;
                         }
                         return false;
+
                     case TypeOfInteger.Int8:
                         byte? thisByte= this.RetrieveValue() as byte?;
                         byte? otherByte= other.RetrieveValue() as byte?;
@@ -186,7 +190,8 @@ namespace HammingCode.HammingTypes
                             return false;
                         if (thisByte == otherByte)
                             return true;
-                        return false;                        
+                        return false;    
+                        
                     case TypeOfInteger.Int16:
                         Int16? thisInt16 = this.RetrieveValue() as Int16?;
                         Int16? otherInt16 = other.RetrieveValue() as Int16?;
@@ -194,7 +199,8 @@ namespace HammingCode.HammingTypes
                             return false;
                         if (thisInt16 == otherInt16)
                             return true;
-                        return false;                        
+                        return false;     
+                        
                     case TypeOfInteger.Int32:
                         Int32? thisInt32 = this.RetrieveValue() as Int32?;
                         Int32? otherInt32 = other.RetrieveValue() as Int32?;
@@ -203,6 +209,7 @@ namespace HammingCode.HammingTypes
                         if (thisInt32 == otherInt32)
                             return true;
                         return false;
+
                     case TypeOfInteger.Int64:
                         Int64? thisInt64 = this.RetrieveValue() as Int64?;
                         Int64? otherInt64 = other.RetrieveValue() as Int64?;
@@ -230,7 +237,7 @@ namespace HammingCode.HammingTypes
                 case TypeOfInteger.Int16:
                     Int16 shortNum = data[1]; // high byte
                     shortNum <<= 8;
-                    shortNum &= data[0]; // low byte
+                    shortNum |= data[0]; // low byte
                     return shortNum;
 
                 case TypeOfInteger.Int32:
@@ -238,7 +245,7 @@ namespace HammingCode.HammingTypes
                     for (int i = 2; i >= 0; i--)
                     {
                         intNum <<= 8;
-                        intNum &= data[i]; // lower bytes
+                        intNum |= data[i]; // lower bytes
                     }
                     return intNum;
 
@@ -247,7 +254,7 @@ namespace HammingCode.HammingTypes
                     for (int i = 6; i >= 0; i--)
                     {
                         longNum <<= 8;
-                        longNum &= data[i]; // lower bytes
+                        longNum |= data[i]; // lower bytes
                     }
                     return longNum;
 
